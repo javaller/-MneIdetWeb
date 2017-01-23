@@ -1,5 +1,6 @@
 DROP TABLE MI_User;
 
+
 CREATE TABLE MI_User (
 	id_user NUMBER(11) NOT NULL,
 	index_user NUMBER(11),
