@@ -1,5 +1,7 @@
 package model;
 
+import oracle.sql.ROWID;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -12,79 +14,8 @@ public class UserStorage {
     private ArrayList<User> users;
     private static UserStorage sUserStorage;
 
-    private static UserStorage get() {
-        if (sUserStorage == null) {
-            return new UserStorage();
-        }
-        return sUserStorage;
-    }
-
-    public void insertUser(User user) throws ClassNotFoundException, SQLException {
-        Locale.setDefault(Locale.ENGLISH);
-        Class.forName("oracle.jdbc.driver.OracleDriver");
-        Connection conn = null;
-        PreparedStatement ps = null;
-
-        try {
-            conn = DriverManager
-                    .getConnection("jdbc:oracle:thin:@localhost:1521:xe", "hr", "hr");
-            ps = conn
-                    .prepareStatement("INSERT INTO MI_USER (BALANCE, AGE, NAME_USER, GENDER, COMPANY, EMAIL, ADDRESS)\n" +
-                            "    VALUES (?, ?, ?, ?, ?, ?, ?)");
-            ps.setDouble(1, user.getDoubleBallans());
-            ps.setInt(2, user.getAge());
-            ps.setString(3, user.getName());
-            ps.setString(4, user.getGender());
-            ps.setString(5, user.getCompany());
-            ps.setString(6, user.getEmail());
-            ps.setString(7, user.getAddress());
-
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (ps != null) {
-                ps.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        }
-    }
-
     public UserStorage() {
         users = new ArrayList<User>();
-        for (int i = 0; i < 10; i++) {
-            User user = new User();
-            user.setIndex("123123");
-            user.setGuid("t123123");
-            if (i % 2 == 0) {
-                user.setActive(false);
-            } else {
-                user.setActive(true);
-            }
-            user.setBalance(50.0);
-            user.setPicture("C:Test\test");
-            user.setAge(18 + i);
-            user.setEyeColor("blue");
-            user.setName("Sasha");
-            user.setGender("f");
-            user.setCompany("Epam");
-            user.setEmail("Epam@");
-            user.setPhone("+8124445556");
-            user.setAddress("test test test");
-            user.setAbout("Tro lololololo");
-            user.setRegistered("Chelusk 13");
-            user.setLatitude(80.0);
-            user.setLongitude(90.0);
-            user.setGreeting("ola ola ola");
-            user.setFavoriteFruit("mango mango");
-            user.setFriends(null);
-            user.setTags(null);
-            users.add(user);
-            System.out.println("User storage generated!");
-        }
     }
 
     public ArrayList<User> getUsers() {
@@ -105,34 +36,171 @@ public class UserStorage {
         return true;
     }
 
-    public Boolean saveUsers() throws ClassNotFoundException {
+    public Boolean deleteAllUsers() throws ClassNotFoundException {
         Locale.setDefault(Locale.ENGLISH);
         Class.forName("oracle.jdbc.driver.OracleDriver");
         try {
-            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "hr", "hr");
-            Statement stmt = conn.createStatement();
+            Connection conn = DriverManager
+                    .getConnection("jdbc:oracle:thin:@localhost:1521:xe", "hr", "hr");
+            Statement stmt = conn
+                    .createStatement();
+
             int deleteResult = stmt
+                    .executeUpdate("delete from FRIENDS");
+
+            deleteResult = stmt
+                    .executeUpdate("delete from USER_TAG");
+
+
+            deleteResult = stmt
                     .executeUpdate("delete from MI_USER");
 
-            for (User user: users) {
-                PreparedStatement ps = conn.prepareStatement("INSERT INTO MI_USER (BALANCE, AGE, NAME_USER, GENDER, COMPANY, EMAIL, ADDRESS)\n" +
-                        "    VALUES (?, ?, ?, ?, ?, ?, ?)");
-                ps.setDouble(1, user.getDoubleBallans());
-                ps.setInt(2, user.getAge());
-                ps.setString(3, user.getName());
-                ps.setString(4, user.getGender());
-                ps.setString(5, user.getCompany());
-                ps.setString(6, user.getEmail());
-                ps.setString(7, user.getAddress());
-
-                ps.executeUpdate();
-
-                System.out.println("User storage saved!");
-            }
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public void loadAllUserFromDB () throws ClassNotFoundException {
+//        Locale.setDefault(Locale.ENGLISH);
+//        Class.forName("oracle.jdbc.driver.OracleDriver");
+        try {
+            Connection conn = DriverManager
+                    .getConnection("jdbc:oracle:thin:@localhost:1521:xe", "hr", "hr");
+            Statement stmt = conn
+                    .createStatement();
+            ResultSet rs = stmt
+                    .executeQuery("select ID_USER, INDEX_USER, GUID, ISACTIVE, BALANCE, " +
+                            "PICTURE, AGE, EYECOLOR, NAME_USER, GENDER, COMPANY, EMAIL," +
+                            "PHONE, ADDRESS , ABOUT, REGISTERED, LATITUDE, LONGITUDE," +
+                            "GREETING, FAVORITEFRUIT" +
+                            " from MI_USER");
+            while (rs.next()) {
+                User user = new User();
+                Long userID = rs.getLong(1);
+                System.out.println(userID);
+                Long index = rs.getLong(2);
+                user.setIndex(index.toString());
+                System.out.print(index + " ");
+                String guid = rs.getString(3);
+                user.setIndex(guid);
+                System.out.print(guid + " ");
+                Integer isActive = rs.getInt(4);
+                if (isActive == 0) {
+                    user.setActive(false);
+                } else {
+                    user.setActive(true);
+                }
+                Double balance = rs.getDouble(5);
+                user.setBalance(balance);
+                System.out.print(balance + " ");
+                String picture = rs.getString(6);
+                user.setPicture(picture);
+                System.out.print(picture + " ");
+                Integer age = rs.getInt(7);
+                user.setAge(age);
+                System.out.print(age + " ");
+                String eyeColor = rs.getString(8);
+                user.setEyeColor(eyeColor);
+                System.out.print(eyeColor + " ");
+                String name_user = rs.getString(9);
+                user.setName(name_user);
+                System.out.print(name_user + " ");
+                String gender = rs.getString(10);
+                user.setGender(gender);
+                System.out.print(gender + " ");
+                String conpany = rs.getString(11);
+                user.setCompany(conpany);
+                System.out.print(conpany + " ");
+                String email = rs.getString(12);
+                user.setEmail(email);
+                System.out.print(email + " ");
+                String phone = rs.getString(13);
+                user.setPhone(phone);
+                System.out.print(phone + " ");
+                String address = rs.getString(14);
+                user.setAddress(address);
+                System.out.print(address + " ");
+                String about = rs.getString(15);
+                user.setAbout(about);
+                System.out.print(about + " ");
+                String registered = rs.getString(16);
+                user.setRegistered(registered);
+                System.out.print(registered + " ");
+                Double latitude = rs.getDouble(17);
+                user.setLatitude(latitude);
+                System.out.print(latitude + " ");
+                Double longitude = rs.getDouble(18);
+                user.setLongitude(longitude);
+                System.out.print(longitude + " ");
+                String greeting = rs.getString(19);
+                user.setGreeting(greeting);
+                System.out.print(greeting + " ");
+                String favoriteFruit = rs.getString(20);
+                user.setFavoriteFruit(favoriteFruit);
+                System.out.println(favoriteFruit);
+
+                ArrayList<Friend> friends = new ArrayList<Friend>();
+                Statement stmt1 = conn.createStatement();
+                ResultSet rs1 = stmt1
+                        .executeQuery("SELECT * FROM FRIENDS WHERE ID_USER = " + userID.toString());
+                while (rs1.next()){
+                    String friendName = rs1.getString(2);
+                    System.out.println(friendName);
+                    Friend friend = new Friend(friendName);
+                    friends.add(friend);
+                }
+
+                ArrayList<Tag> tags = new ArrayList<>();
+                Statement stmt2 = conn.createStatement();
+                ResultSet rs2 = stmt2
+                        .executeQuery("SELECT * FROM USER_TAG WHERE ID_USER = " + userID.toString());
+                while (rs2.next()){
+                    String tagName = rs2.getString(2);
+                    System.out.println(tagName);
+                    Tag tag = new Tag(tagName);
+                    tags.add(tag);
+                }
+                users.add(user);
+            }
+            System.out.println(users.size());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static UserStorage get() {
+        if (sUserStorage == null) {
+            return new UserStorage();
+        }
+        return sUserStorage;
+    }
+
+    public void insertUser(User user) throws ClassNotFoundException, SQLException {
+        Locale.setDefault(Locale.ENGLISH);
+        Class.forName("oracle.jdbc.driver.OracleDriver");
+        Connection conn = null;
+
+        try {
+            conn = DriverManager
+                    .getConnection("jdbc:oracle:thin:@localhost:1521:xe", "hr", "hr");
+            int userID = user.postUser(conn);
+
+            for (Friend friend : user.getFriends()) {
+                friend.postFriend(conn, userID);
+            }
+
+            for (Tag tag : user.getTags()) {
+                tag.postTag(conn, userID);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
 }

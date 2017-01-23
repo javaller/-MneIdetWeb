@@ -1,5 +1,6 @@
 package model;
 
+import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -268,5 +269,42 @@ public class User {
     public String getFavoriteFruit() {
 
         return favoriteFruit;
+    }
+
+    public int postUser(Connection conn) throws SQLException {
+
+        PreparedStatement ps = null;
+
+        int userID = 0;
+
+        try {
+            ps = conn
+                    .prepareStatement("INSERT INTO MI_USER (BALANCE, AGE, NAME_USER, GENDER, COMPANY, EMAIL, ADDRESS)\n" +
+                            " VALUES (?, ?, ?, ?, ?, ?, ?)", new String[]{"ID_USER"} /*Statement.RETURN_GENERATED_KEYS*/);
+
+            ps.setDouble(1, getDoubleBallans());
+            ps.setInt(2, getAge());
+            ps.setString(3, getName());
+            ps.setString(4, getGender());
+            ps.setString(5, getCompany());
+            ps.setString(6, getEmail());
+            ps.setString(7, getAddress());
+
+            ps.executeUpdate();
+
+            ResultSet resultSet = ps.getGeneratedKeys();
+
+
+            if (resultSet != null) {
+                resultSet.next();
+                userID = resultSet.getInt(1);
+                System.out.println(userID);
+            }
+        } finally {
+            if (ps != null) {
+                ps.close();
+            }
+        }
+        return userID;
     }
 }
