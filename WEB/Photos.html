@@ -1,0 +1,37 @@
+<!doctype html>
+<html ng-app="demo">
+<head>
+    <title>Hello AngularJS</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+    <script>var app = angular.module('demo', []);
+        app.controller('Hello', function ($scope, $http) {
+
+            $scope.id = "146133434";
+            $http.get('https://api.vk.com/method/photos.get?owner_id=146133434&album_id=profile').then(function (response) {
+                $scope.myData = response.data.response;
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <h1>List of photos</h1>
+    <p>Enter VK id please.</p>
+    <p>ID : <input type="text" ng-model="id"></p>
+
+
+    <p>Your id is {{id}}<p/>
+
+<div ng-controller="Hello">
+    <ul>
+        <li ng-repeat="photo in myData">
+            <ul>
+                <img ng-src="{{photo.src_small}}">
+                <li>Hello!</li>
+                <li>Here is my photo</li>
+            </ul>
+        </li>
+        <ul>
+</div>
+</body>
+</html>

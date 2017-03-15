@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MneIdetWeb</title>
+        <meta charset="windows-1251">
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+        <script>
+            var app = angular.module('myApp', []);
+            app.controller('personCtrl', function($scope, $http) {
+                $scope.beforePhotoID = "https://api.vk.com/method/photos.get?owner_id=";
+                $scope.afterPhotoID = "&album_id=profile";
+                $scope.beforeUserID = "https://api.vk.com/method/users.get?user_id=";
+                $scope.afterUserID = "&v=5.52";
+                $scope.id = "146133434";
+                $scope.getAllPhotoURL = function() {
+                    return $scope.beforePhotoID + $scope.id + $scope.afterPhotoID;
+                };
+                $scope.getUserUrl = function () {
+                    return $scope.beforeUserID + $scope.id + $scope.afterUserID;
+                };
+                $http.get($scope.getAllPhotoURL()).then(function (response) {
+                    $scope.myData = response.data.response;
+                });
+                $http.get($scope.getUserUrl()).then(function (response) {
+                    $scope.myDat = response.data.response;
+                });
+                $scope.showMe = false;
+                $scope.myFunc = function (x) {
+                    $scope.id = x;
+                    $http.get($scope.getAllPhotoURL()).then(function (response) {
+                        $scope.myData = response.data.response;
+                    });
+                    $http.get($scope.getUserUrl()).then(function (response) {
+                        $scope.myDat = response.data.response;
+                    });
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <div ng-app="myApp" ng-controller="personCtrl">
+            <div style="width: 100%">
+                <div style="background-color: #b5dcb3; width: 100%">
+                    <h1>Мне Идет: Приложение для работы fashion консультанта.</h1>
+                </div>
+                <div style="background-color: #b5dcb3; width: 100%">
+                    <ul><b>Информация о клиенте</b></ul>
+                    <ul>
+                        <p>
+                            ID: <input type="text" ng-model="id">
+                            <button ng-click="myFunc(id)">Click Me!</button>
+                        </p>
+                    </ul>
+                    <br>
+                    <p>
+                        <ul>
+                            get String: {{getUserUrl()}}
+                        </ul>
+                        <ul>
+                            <li ng-repeat="x in myDat">
+                                {{ x.first_name + ' ' + x.last_name}}
+                            </li>
+                        </ul>
+                    </p>
+                    <br>
+                </div>
+                <div style="background-color:#aaa; height:100%;width:15%;float:left;">
+                    <ul><b>Список фото</b></ul>
+                    <li ng-repeat="photo in myData">
+                        <ul>
+                            <img ng-src="{{photo.src_small}}">
+                            <p>Оцените прикид</p>
+                        </ul>
+                    </li>
+                </div>
+                <div style="background-color:#eee; height:100%;width:50%;float:left;">
+                    <ul><b>Фото клиента</b></ul>
+                </div>
+                <div style="background-color:#aaa; height:100%;width:35%;float:right;">
+                    <ul>
+                        <b>Комментарии к фото</b>
+                    </ul>
+                    <ul>
+                        <b>Тебе идет</b>
+                    </ul>
+                </div>
+                <div style="background-color:#b5dcb3;clear:both">
+                    <center>
+                        Moscow 2017 MneIdet.com
+                    </center>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
