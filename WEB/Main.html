@@ -21,6 +21,8 @@
                 $http.get($scope.getAllPhotoURL()).then(function (response) {
                     $scope.myData = response.data.response;
                 });
+
+//                {"response":[{"id":146133434,"first_name":"Вадим","last_name":"Опольский"}]}
                 $http.get($scope.getUserUrl()).then(function (response) {
                     $scope.myDat = response.data.response;
                 });
@@ -57,6 +59,7 @@
                             get String: {{getUserUrl()}}
                         </ul>
                         <ul>
+                            <!--{"response":[{"id":146133434,"first_name":"Вадим","last_name":"Опольский"}]}-->
                             <li ng-repeat="x in myDat">
                                 {{ x.first_name + ' ' + x.last_name}}
                             </li>
