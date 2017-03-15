@@ -21,7 +21,14 @@
                 $http.get($scope.getAllPhotoURL()).then(function (response) {
                     $scope.myData = response.data.response;
                 });
-
+                $http.get('http://rest-service.guides.spring.io/greeting').then(function(response) {
+                    $scope.users = response.data;
+                });
+//                {"response":{"count":5,"items":[{"id":39,"from_id":146133434,"date":1489511400,"text":"test"},
+//                    {"id":40,"from_id":146133434,"date":1489511741,"text":"test"},
+//                    {"id":41,"from_id":146133434,"date":1489511879,"text":"test"},
+//                    {"id":42,"from_id":146133434,"date":1489520504,"text":"test1"},
+//                    {"id":43,"from_id":146133434,"can_edit":1,"date":1489612204,"text":"test2"}]}}
 //                {"response":[{"id":146133434,"first_name":"Вадим","last_name":"Опольский"}]}
                 $http.get($scope.getUserUrl()).then(function (response) {
                     $scope.myDat = response.data.response;
@@ -63,6 +70,7 @@
                             <li ng-repeat="x in myDat">
                                 {{ x.first_name + ' ' + x.last_name}}
                             </li>
+                            <p>The ID is {{users.last_name}}</p>
                         </ul>
                     </p>
                     <br>

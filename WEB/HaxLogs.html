@@ -1,0 +1,21 @@
+<html ng-app="demo">
+ <head>
+  <title>Hello AngularJS</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+             <script>
+                angular.module('demo', [])
+                  .controller('Hello', function($scope, $http) {
+                  $http.get('http://rest-service.guides.spring.io/greeting').
+//                     $http.get('https://api.vk.com/method/users.get?user_id=210700286&v=5.52').
+                     then(function(response) {
+                        $scope.users = response.data;
+                      });
+                   });
+                </script>
+ </head>
+
+ <body>
+  <div ng-controller="Hello">
+   <p>The ID is {{users.last_name}}</p>
+  </div>
+ </body>
