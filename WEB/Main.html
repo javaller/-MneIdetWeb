@@ -4,36 +4,50 @@
         <title>MneIdetWeb</title>
         <meta charset="windows-1251">
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-sanitize.js"></script>
         <script>
-            var app = angular.module('myApp', []);
+            var app = angular.module('myApp', ['ngSanitize']);
             app.controller('personCtrl', function($scope, $http) {
                 $scope.beforePhotoID = "https://api.vk.com/method/photos.get?owner_id=";
                 $scope.afterPhotoID = "&album_id=profile";
                 $scope.beforeUserID = "https://api.vk.com/method/users.get?user_id=";
                 $scope.afterUserID = "&v=5.52";
+                $scope.beforeComment = "https://api.vk.com/method/photos.getComments?owner_id=";
+                $scope.photoID = "456239033";
                 $scope.id = "146133434";
+                $scope.accessToken = "39b1b22d1939e1c589ff7218c8c535ed7a59853c3d17555df1b629cb148286a1d58491825742faf79326e";
+                $scope.message = "";
+                $scope.myText = "My name is: <h1>John Doe</h1>";
                 $scope.getAllPhotoURL = function() {
                     return $scope.beforePhotoID + $scope.id + $scope.afterPhotoID;
                 };
                 $scope.getUserUrl = function () {
                     return $scope.beforeUserID + $scope.id + $scope.afterUserID;
                 };
+                $scope.getCommentsURL = function () {
+                    return $scope.beforeComment + $scope.id + '&photo_id=' + $scope.photoID + '&v=5.62&access_token=' + $scope.accessToken;
+                };
                 $http.get($scope.getAllPhotoURL()).then(function (response) {
                     $scope.myData = response.data.response;
-                });
-                $http.get('http://rest-service.guides.spring.io/greeting').then(function(response) {
-                    $scope.users = response.data;
                 });
 //                {"response":{"count":5,"items":[{"id":39,"from_id":146133434,"date":1489511400,"text":"test"},
 //                    {"id":40,"from_id":146133434,"date":1489511741,"text":"test"},
 //                    {"id":41,"from_id":146133434,"date":1489511879,"text":"test"},
 //                    {"id":42,"from_id":146133434,"date":1489520504,"text":"test1"},
 //                    {"id":43,"from_id":146133434,"can_edit":1,"date":1489612204,"text":"test2"}]}}
-//                {"response":[{"id":146133434,"first_name":"Вадим","last_name":"Опольский"}]}
+                $http.get($scope.getCommentsURL())
+                    .then(function (response) {
+                        $scope.comment = response.data.response;
+                    });
                 $http.get($scope.getUserUrl()).then(function (response) {
                     $scope.myDat = response.data.response;
                 });
                 $scope.showMe = false;
+                $scope.sendMessage = function (message) {
+                    $http.get("https://api.vk.com/method/photos.createComment?owner_id=146133434&photo_id=456239033&message=" + message + "&from_group=0&v=5.62&access_token=" + $scope.accessToken)
+                        .then(function (response) {$scope.send = response.data.response;
+                    });
+                }
                 $scope.myFunc = function (x) {
                     $scope.id = x;
                     $http.get($scope.getAllPhotoURL()).then(function (response) {
@@ -63,14 +77,12 @@
                     <br>
                     <p>
                         <ul>
-                            get String: {{getUserUrl()}}
-                        </ul>
-                        <ul>
-                            <!--{"response":[{"id":146133434,"first_name":"Вадим","last_name":"Опольский"}]}-->
                             <li ng-repeat="x in myDat">
                                 {{ x.first_name + ' ' + x.last_name}}
                             </li>
-                            <p>The ID is {{users.last_name}}</p>
+                        </ul>
+                        <ul>
+                            Test {{getCommentsURL()}}
                         </ul>
                     </p>
                     <br>
@@ -80,6 +92,7 @@
                     <li ng-repeat="photo in myData">
                         <ul>
                             <img ng-src="{{photo.src_small}}">
+                            <img ng-click="openPhoto(photo.src_big)" />
                             <p>Оцените прикид</p>
                         </ul>
                     </li>
@@ -91,9 +104,12 @@
                     <ul>
                         <b>Комментарии к фото</b>
                     </ul>
-                    <ul>
-                        <b>Тебе идет</b>
-                    </ul>
+                    <li ng-repeat="x in comment.items">
+                        {{ x.id + ' ' + x.text}}
+                    </li>
+                    <br>
+                    Message: <input type="text" ng-model="message">
+                    <button ng-click="sendMessage(message)">Click Me!</button>
                 </div>
                 <div style="background-color:#b5dcb3;clear:both">
                     <center>

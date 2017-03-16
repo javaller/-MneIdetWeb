@@ -5,6 +5,7 @@
              <script>
                 angular.module('demo', [])
                   .controller('Hello', function($scope, $http) {
+//                      {"id":17,"content":"Hello, World!"}
                   $http.get('http://rest-service.guides.spring.io/greeting').
 //                     $http.get('https://api.vk.com/method/users.get?user_id=210700286&v=5.52').
                      then(function(response) {
@@ -16,6 +17,7 @@
 
  <body>
   <div ng-controller="Hello">
-   <p>The ID is {{users.last_name}}</p>
+   <p>The ID is {{users.content}}</p>
   </div>
  </body>
+</html>
