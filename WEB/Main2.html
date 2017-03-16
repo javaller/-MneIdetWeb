@@ -15,7 +15,7 @@
                 $scope.beforeComment = "https://api.vk.com/method/photos.getComments?owner_id=";
                 $scope.photoID = "456239033";
                 $scope.id = "146133434";
-                $scope.accessToken = "39b1b22d1939e1c589ff7218c8c535ed7a59853c3d17555df1b629cb148286a1d58491825742faf79326e";
+                $scope.accessToken = "39b1b22d1939e1c589ff7218c8c535ed7a59853c3d17555df1b629cb148286a1d58491825742faf79326e";				
                 $scope.message = "";
                 $scope.myText = "My name is: <h1>John Doe</h1>";
                 $scope.getAllPhotoURL = function() {
@@ -30,9 +30,6 @@
                 $http.get($scope.getAllPhotoURL()).then(function (response) {
                     $scope.myData = response.data.response;
                 });
-                $scope.getCreateCommentsURL = function () {
-                    return "https://api.vk.com/method/photos.createComment?owner_id=" + $scope.id + "&photo_id=" + $scope.photoID + "&message=" + message + "&from_group=0&v=5.62&access_token=" + $scope.accessToken;
-                };
 //                {"response":{"count":5,"items":[{"id":39,"from_id":146133434,"date":1489511400,"text":"test"},
 //                    {"id":40,"from_id":146133434,"date":1489511741,"text":"test"},
 //                    {"id":41,"from_id":146133434,"date":1489511879,"text":"test"},
@@ -47,15 +44,10 @@
                 });
                 $scope.showMe = false;
                 $scope.sendMessage = function (message) {
-                    $http.get("https://api.vk.com/method/photos.createComment?owner_id=" + $scope.id + "&photo_id=" + $scope.photoID + "&message=" + message + "&from_group=0&v=5.62&access_token=" + $scope.accessToken)
+                    $http.get("https://api.vk.com/method/photos.createComment?owner_id=146133434&photo_id=456239033&message=" + message + "&from_group=0&v=5.62&access_token=" + $scope.accessToken)
                         .then(function (response) {$scope.send = response.data.response;
                     });
-                };
-//                $scope.getUserName = function (x) {
-//                    $http.get($scope.beforeUserID + x + $scope.afterUserID).then(function (response) {
-//                        $scope.userInf = response.data.response;
-//                    });
-//                };
+                }
                 $scope.myFunc = function (x) {
                     $scope.id = x;
                     $http.get($scope.getAllPhotoURL()).then(function (response) {
@@ -64,7 +56,11 @@
                     $http.get($scope.getUserUrl()).then(function (response) {
                         $scope.myDat = response.data.response;
                     });
-                };
+                }
+				
+				$scope.openPhoto = function (src) {
+				   $scope.photo = "<img src=\""+src+"\"/>";
+				}
             });
         </script>
     </head>
@@ -99,21 +95,21 @@
                     <ul><b>Список фото</b></ul>
                     <li ng-repeat="photo in myData">
                         <ul>
-                            <img ng-src="{{photo.src_small}}">
-                            <img ng-click="openPhoto(photo.src_big)" />
+                            <img ng-src="{{photo.src_small}}" ng-click="openPhoto(photo.src_big)">
                             <p>Оцените прикид</p>
                         </ul>
                     </li>
                 </div>
                 <div style="background-color:#eee; height:100%;width:50%;float:left;">
                     <ul><b>Фото клиента</b></ul>
+					<div ng-bind-html="photo"></div>
                 </div>
                 <div style="background-color:#aaa; height:100%;width:35%;float:right;">
                     <ul>
                         <b>Комментарии к фото</b>
                     </ul>
                     <li ng-repeat="x in comment.items">
-                        {{ x.from_id + ' ' + x.text}}
+                        {{ x.id + ' ' + x.text}}
                     </li>
                     <br>
                     Message: <input type="text" ng-model="message">
